@@ -7,12 +7,12 @@ import torch
 from pdf2image import convert_from_path
 from doclayout_yolo import YOLOv10
 import shutil
-warnings.filterwarnings('ignore')
 import re
-device = "cuda" if torch.cuda.is_available() else "cpu"
-def load_model():
-    return YOLOv10("./models/doclayout_yolo_docstructbench_imgsz1280_2501.pt").to(device)
-model = load_model()
+# from page1 import SummarizeSection
+
+def load_model(device):
+    return YOLOv10("../models/doclayout_yolo_docstructbench_imgsz1280_2501.pt").to(device)
+
 # OCR helper
 
 def run_zoom_ocr(frame, coords,lbl=""):
@@ -28,7 +28,7 @@ def run_zoom_ocr(frame, coords,lbl=""):
         text = text.replace("- ", "")
     return text
 
-def save_region_image(frame, coords, label, index, out_dir="extracted_figures"):
+def save_region_image(frame, coords, label, index, out_dir="./data/extracted_figures"):
     os.makedirs(out_dir, exist_ok=True)
     x1, y1, x2, y2 = coords
     roi = frame[y1:y2, x1:x2]
@@ -38,8 +38,8 @@ def save_region_image(frame, coords, label, index, out_dir="extracted_figures"):
     cv2.imwrite(filename, roi)
     return filename
 
-def process_page(frame, page_num):
-    folder_path = "./extracted_figures"
+def process_page(frame, page_num,model):
+    folder_path = "./data/extracted_figures"
     os.makedirs(folder_path, exist_ok=True)
 
     results = model.predict(frame)
@@ -95,7 +95,7 @@ def process_page(frame, page_num):
         return False
 
     # Write text
-    with open("content.txt","a", encoding="utf-8") as file:
+    with open("./data/content.txt","a", encoding="utf-8") as file:
         file.write(f"\n---------PAGE {page_num}--------\n\n")
 
         for idx, det in enumerate(detections):
@@ -154,20 +154,38 @@ def process_page(frame, page_num):
                         file.write(f"\n[IMAGE] {img_path}\n\n")
 
     print(f" Page {page_num} processed and saved to content.txt")
+    # if( page_num == 1):
+    #     SummarizeSection()
 
-# Removing Old Images
-folder_path = "./extracted_figures"
-if os.path.exists(folder_path):
-        shutil.rmtree(folder_path)
-        print(f"Deleted folder: {folder_path}")
+# Main Function
+def output(filename : str):
+    
+    warnings.filterwarnings('ignore')
 
-# Removing Old Text content
-content_path="content.txt"
-if os.path.exists(content_path):
-    os.remove(content_path)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = load_model(device)
+    folder_path = "./data/extracted_figures"
+    if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+            print(f"Deleted folder: {folder_path}")
 
-pages = convert_from_path("./ss.pdf", dpi=200)
+    # Removing Old Text content
+    content_path="./data/content.txt"
+    if os.path.exists(content_path):
+        os.remove(content_path)
+    base_dir = os.path.dirname(os.path.abspath(__file__))  # -> Python/
+    pdf_path = os.path.join(base_dir, "..", "uploads", filename)
+    pdf_path = os.path.abspath(pdf_path)  # normalize it fully
 
-for page_num, page in enumerate(pages, 1):
-    frame = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2BGR)
-    process_page(frame, page_num)
+    print(" PDF Path:", pdf_path)  # optional debug
+
+    pages = convert_from_path(pdf_path, dpi=200)
+
+    # pages = convert_from_path(f"../uploads/{filename}", dpi=200)
+
+    for page_num, page in enumerate(pages, 1):
+        frame = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2BGR)
+        process_page(frame, page_num,model)
+
+
+# output("temp.pdf")

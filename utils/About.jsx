@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import docImage from "./1.jpg"; // ✅ correct relative import (same folder as About.jsx)
+// import docImage from "./1.jpg"; // ✅ correct relative import (same folder as About.jsx)
 
 export default function About() {
   return (

@@ -19,10 +19,11 @@ const handleUpload = async (file) => {
 
     if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
     const data = await res.json();
-    alert("✅ File uploaded successfully: " + data.filename);
+    console.log(" File uploaded successfully: " + data.filename);
+    setUploadMessage(" File uploaded successfully: " + data.filename);
   } catch (err) {
     console.log("Error:", err);
-    alert("❌ Upload failed. Check backend console for details.");
+    // con(" Upload failed. Check backend console for details.");
   }
 };
 
