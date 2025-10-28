@@ -34,13 +34,11 @@ def SummarizeSection():
         if author[0].__contains__('[PLAIN_TEXT]'):
             temp = author[0]
             author[0] = temp[13:]
+            print(author)
         
         return content_read
     
-con= SummarizeSection()
-print(len(con))
-for line in con:
-    print(f"{line}\n")        
+      
         
         
 
