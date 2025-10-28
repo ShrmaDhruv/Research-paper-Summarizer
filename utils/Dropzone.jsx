@@ -1,44 +1,58 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaTrash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function MyDropzone() {
   const [files, setFiles] = useState([]);
-  const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [loading, setLoading] = useState(false); //added loading state
+  const navigate = useNavigate();
 
-const handleUpload = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
+  const handleUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  try {
-    const res = await fetch("http://127.0.0.1:8000/upload/", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:8000/upload/", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
-    const data = await res.json();
-    console.log(" File uploaded successfully: " + data.filename);
-    setUploadMessage(" File uploaded successfully: " + data.filename);
-  } catch (err) {
-    console.log("Error:", err);
-    // con(" Upload failed. Check backend console for details.");
-  }
-};
+      if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
+      const data = await res.json();
+      console.log("File uploaded successfully:", data.filename);
+      setUploadMessage(`File uploaded successfully: ${data.filename}`);
+    } catch (err) {
+      console.log("Error:", err);
+      setUploadMessage("Upload failed. Check backend console for details.");
+    }
+  };
+
+  const handleProcess = async () => {
+    setLoading(true); // start spinner
+    try {
+      const res = await fetch("http://127.0.0.1:8000/process/");
+      const data = await res.json();
+      if (data.content) {
+        navigate("/process", { state: { content: data.content } });
+      } else {
+        alert("Processing failed: " + (data.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to backend");
+    } finally {
+      setLoading(false); // ✅ stop spinner
+    }
+  };
 
   const onDrop = useCallback((acceptedFiles) => {
     const mapped = acceptedFiles.map((file) =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      })
+      Object.assign(file, { preview: URL.createObjectURL(file) })
     );
     setFiles(mapped);
-
-    // Auto upload the first file (single file support)
-    if (mapped.length > 0) {
-      handleUpload(mapped[0]);
-    }
+    if (mapped.length > 0) handleUpload(mapped[0]);
   }, []);
 
   const removeFile = (fileName) => {
@@ -103,21 +117,41 @@ const handleUpload = async (file) => {
 
       <aside className="flex flex-wrap gap-4 mt-6">{thumbs}</aside>
 
-      {uploading && (
-        <p className="mt-4 text-blue-600 font-medium animate-pulse">
-          ⏳ Uploading...
-        </p>
-      )}
       {uploadMessage && (
-        <p
-          className={`mt-4 font-medium ${
-            uploadMessage.startsWith("✅")
-              ? "text-green-600"
-              : "text-red-600"
-          }`}
-        >
-          {uploadMessage}
-        </p>
+        <div className="mt-4 text-center">
+          <p
+            className={`font-medium ${
+              uploadMessage.startsWith("File uploaded successfully")
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            {uploadMessage}
+          </p>
+
+          {uploadMessage.startsWith("File uploaded successfully") && (
+            <>
+              {/* ✅ Process button + spinner */}
+              <button
+                onClick={handleProcess}
+                disabled={loading}
+                className={`mt-3 px-4 py-2 rounded-lg transition ${
+                  loading
+                    ? "bg-blue-400 cursor-not-allowed text-white"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Processing...</div>
+                ) : (
+                  "Process"
+                )}
+              </button>
+            </>
+          )}
+        </div>
       )}
     </section>
   );

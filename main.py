@@ -2,11 +2,8 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
-import sys
 import Python.OCR as my
 from Python.page1 import SummarizeSection
-
-# filename=""
 
 app = FastAPI()
 
@@ -20,6 +17,7 @@ app.add_middleware(
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+PDF_NAME = ""
 
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
@@ -27,10 +25,20 @@ async def upload_file(file: UploadFile = File(...)):
         file_location = os.path.join(UPLOAD_FOLDER, file.filename)
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-            my.output(file.filename)
-            # filename=file.filename
+        global PDF_NAME
+        PDF_NAME = file.filename
         return {"filename": file.filename, "message": "File uploaded successfully"}
     except Exception as e:
-        print(f"❌ Error while saving file: {e}")
         return {"error": str(e)}
-    
+
+@app.get("/process/")
+async def process_file():
+    global PDF_NAME
+    if not PDF_NAME:
+        return {"error": "No file uploaded yet"}
+    try:
+        my.output(PDF_NAME)
+        result = SummarizeSection()
+        return {"content": result}
+    except Exception as e:
+        return {"error": str(e)}

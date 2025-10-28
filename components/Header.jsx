@@ -3,6 +3,7 @@ import { Routes, Route, NavLink } from "react-router-dom";
 import HomePage from "./HomePage";
 import About from "../utils/About";
 import Contact from "../utils/Contact";
+import Process from "../utils/Process"; // ✅ import the new page
 
 export default function Header() {
   return (
@@ -10,16 +11,18 @@ export default function Header() {
       <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent tracking-wide">
-            Reseach paper Summerizer
+            Research Paper Summarizer
           </h1>
+
           <nav className="hidden md:flex space-x-8">
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
-                `relative font-medium transition duration-300 ${isActive
-                  ? "text-indigo-600"
-                  : "text-gray-700 hover:text-indigo-500"
+                `relative font-medium transition duration-300 ${
+                  isActive
+                    ? "text-indigo-600"
+                    : "text-gray-700 hover:text-indigo-500"
                 }`
               }
             >
@@ -29,20 +32,23 @@ export default function Header() {
             <NavLink
               to="/About"
               className={({ isActive }) =>
-                `relative font-medium transition duration-300 ${isActive
-                  ? "text-indigo-600"
-                  : "text-gray-700 hover:text-indigo-500"
+                `relative font-medium transition duration-300 ${
+                  isActive
+                    ? "text-indigo-600"
+                    : "text-gray-700 hover:text-indigo-500"
                 }`
               }
             >
               About Project
             </NavLink>
+
             <NavLink
               to="/Contact"
               className={({ isActive }) =>
-                `relative font-medium transition duration-300 ${isActive
-                  ? "text-indigo-600"
-                  : "text-gray-700 hover:text-indigo-500"
+                `relative font-medium transition duration-300 ${
+                  isActive
+                    ? "text-indigo-600"
+                    : "text-gray-700 hover:text-indigo-500"
                 }`
               }
             >
@@ -57,6 +63,7 @@ export default function Header() {
           <Route path="/" element={<HomePage />} />
           <Route path="/About" element={<About />} />
           <Route path="/Contact" element={<Contact />} />
+          <Route path="/process" element={<Process />} /> {/* ✅ Added route */}
         </Routes>
       </main>
     </div>
