@@ -28,14 +28,21 @@ def SummarizeSection():
 
         content_read = page.readlines()
 
-        print("\n--- Content of 'Page.txt' (Read using page.readlines()) ---")
         content_read = [x for x in content_read if x!='\n']
 
         author = content_read[2].split(',') # Name of authors list
         if author[0].__contains__('[PLAIN_TEXT]'):
             temp = author[0]
             author[0] = temp[13:]
-        return author
+        
+        return content_read
+    
+con= SummarizeSection()
+print(len(con))
+for line in con:
+    print(f"{line}\n")        
+        
+        
 
 
 

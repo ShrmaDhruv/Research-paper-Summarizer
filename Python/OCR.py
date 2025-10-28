@@ -154,8 +154,6 @@ def process_page(frame, page_num,model):
                         file.write(f"\n[IMAGE] {img_path}\n\n")
 
     print(f" Page {page_num} processed and saved to content.txt")
-    # if( page_num == 1):
-    #     SummarizeSection()
 
 # Main Function
 def output(filename : str):
@@ -164,28 +162,28 @@ def output(filename : str):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = load_model(device)
+
+    # Remove old Images
+
     folder_path = "./data/extracted_figures"
     if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
-            print(f"Deleted folder: {folder_path}")
 
     # Removing Old Text content
+    
     content_path="./data/content.txt"
     if os.path.exists(content_path):
         os.remove(content_path)
-    base_dir = os.path.dirname(os.path.abspath(__file__))  # -> Python/
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     pdf_path = os.path.join(base_dir, "..", "uploads", filename)
-    pdf_path = os.path.abspath(pdf_path)  # normalize it fully
-
-    print(" PDF Path:", pdf_path)  # optional debug
-
+    pdf_path = os.path.abspath(pdf_path)
     pages = convert_from_path(pdf_path, dpi=200)
 
-    # pages = convert_from_path(f"../uploads/{filename}", dpi=200)
 
     for page_num, page in enumerate(pages, 1):
-        frame = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2BGR)
-        process_page(frame, page_num,model)
+        if page_num == 1:
+            frame = cv2.cvtColor(np.array(page), cv2.COLOR_RGB2BGR)
+            process_page(frame, page_num,model)
+        else:
+            break
 
-
-# output("temp.pdf")

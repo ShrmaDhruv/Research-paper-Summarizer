@@ -22,13 +22,13 @@ export default function Body() {
       });
       if (res.ok) {
         const data = await res.json();
-        setUploadStatus(`✅ ${data.info}`);
+        setUploadStatus(`File uploaded successfully ${data.info}`);
       } else {
-        setUploadStatus("❌ Upload failed. Please try again.");
+        setUploadStatus("Upload failed. Please try again.");
       }
     } catch (err) {
       console.error(err);
-      setUploadStatus("❌ Error connecting to backend.");
+      setUploadStatus("Error connecting to backend.");
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,6 @@ export default function Body() {
           Drag & drop your PDF here or click to browse from your computer.
         </p>
 
-        {/* Pass upload handler to Dropzone */}
         <MyDropzone onFileUpload={handleFileUpload} />
 
         {/* Status Message */}
@@ -56,7 +55,7 @@ export default function Body() {
         {uploadStatus && (
           <p
             className={`mt-6 text-center font-medium ${
-              uploadStatus.startsWith("✅")
+              uploadStatus.startsWith("File uploaded successfully")
                 ? "text-green-600"
                 : "text-red-600"
             }`}

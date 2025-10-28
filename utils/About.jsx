@@ -1,7 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-// import docImage from "./1.jpg"; // ✅ correct relative import (same folder as About.jsx)
-
 export default function About() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6 py-16">
@@ -16,49 +14,29 @@ export default function About() {
         </h2>
 
         <p className="text-gray-700 leading-relaxed mb-4">
-          This project is focused on <span className="font-semibold">Document
-          Layout Analysis</span>, with a special emphasis on extracting
-          meaningful structure from complex documents like{" "}
-          <span className="italic">research papers</span> and{" "}
-          <span className="italic">newspapers</span>. Traditional OCR often
-          struggles with accuracy when applied directly to a whole page,
-          especially when documents contain multiple columns, tables, figures,
-          and headings.
+          <span className="font-semibold">Smart Research Paper Analyzer</span>is a deep learning–based system designed to automatically extract and structure key information from the{" "}
+          <span className="font-semibold">first page of research papers.</span> It focuses on identifying crucial elements such as the title, author names, abstract, and introduction, which are often formatted differently across various publications.
         </p>
 
         <p className="text-gray-700 leading-relaxed mb-4">
-          To address this, I explored multiple models including{" "}
-          <span className="font-semibold">DocLayout-YOLO</span>,{" "}
-          <span className="font-semibold">DocLayNet</span>, and{" "}
-          <span className="font-semibold">PubLayNet</span>-based approaches. The
-          goal is to first detect and classify document regions such as titles,
-          paragraphs, tables, images, and captions. Once identified, these
-          regions are processed individually with OCR, ensuring{" "}
-          <span className="font-semibold">higher text extraction accuracy</span>.
+          Traditional OCR systems struggle to maintain accuracy when applied to research papers containing{" "}
+          <span className="font-semibold">multiple columns, figures, and complex layouts.</span>To address this, the project leverages the
+          <span className="font-semibold">DocLayout-YOLO, DocLayNet, and PubLayNet.</span>
         </p>
 
         <p className="text-gray-700 leading-relaxed mb-4">
-          This two-step pipeline—layout analysis followed by targeted OCR—creates
-          a system that can handle diverse document types more reliably. By
-          combining <span className="text-indigo-500 font-medium">deep learning
-          models for layout detection</span> with{" "}
-          <span className="text-indigo-500 font-medium">OCR engines for text
-          recognition</span>, the project aims to improve the way digital systems
-          process and understand complex, multi-format documents.
+          Once the document regions are accurately detected and classified, a <span className="font-semibold">targeted OCR process</span>
+          is applied to extract text from each identified section. This two-step pipeline—layout analysis followed by
+          <span className="font-semibold">adaptive OCR</span>ensures highly precise and structured text extraction from research paper first pages.
         </p>
 
-        {/* <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 1 }}
-          className="mt-8 flex justify-center"
-        >
-          <img
-            src={docImage}
-            alt="Document Layout Illustration"
-            className="rounded-xl shadow-lg w-full max-w-2xl"
-          />
-        </motion.div> */}
+        <p className="text-grey-700 leading-relaxed mb-4">
+          By combining {" "}<span className="font-semibold">deep learning–based layout detection with OCR-driven text recognition</span>,
+          Smart Research Paper Analyzer provides an efficient solution for digitizing and understanding research documents, enabling better{" "}
+          <span className="font-semibold">metadata extraction, content indexing, and automated academic data processing.</span>
+        </p>
+
+
       </motion.div>
     </div>
   );

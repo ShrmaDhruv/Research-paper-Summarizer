@@ -3,7 +3,7 @@ import { Routes, Route, NavLink } from "react-router-dom";
 import HomePage from "./HomePage";
 import About from "../utils/About";
 import Contact from "../utils/Contact";
-import Process from "../utils/Process"; // ✅ import the new page
+import Process from "../utils/Process";
 
 export default function Header() {
   return (
@@ -11,7 +11,7 @@ export default function Header() {
       <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent tracking-wide">
-            Research Paper Summarizer
+            Smart Research Paper Analyzer
           </h1>
 
           <nav className="hidden md:flex space-x-8">
@@ -63,7 +63,7 @@ export default function Header() {
           <Route path="/" element={<HomePage />} />
           <Route path="/About" element={<About />} />
           <Route path="/Contact" element={<Contact />} />
-          <Route path="/process" element={<Process />} /> {/* ✅ Added route */}
+          <Route path="/process" element={<Process />} />
         </Routes>
       </main>
     </div>

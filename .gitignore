@@ -5,3 +5,4 @@ dist/
 .parcel-cache/
 .venv/
 test/
+uploads/

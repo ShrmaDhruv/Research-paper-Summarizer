@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import Body from "./Body";
-
+import Footer from "./Footer";
 
 export default function HomePage() {
   return (
@@ -12,7 +12,7 @@ export default function HomePage() {
           transition={{ duration: 1 }}
           className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent"
         >
-          Document Layout Analysis
+          Smart Research Paper Analyzer
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 30 }}
@@ -20,18 +20,8 @@ export default function HomePage() {
           transition={{ delay: 0.3, duration: 1 }}
           className="mt-6 max-w-2xl text-lg md:text-xl text-gray-600"
         >
-          A smart tool that analyzes, understands, and processes your documents seamlessly.
+          An intelligent system for automated layout detection and content extraction from research papers.
         </motion.p>
-
-        {/* <motion.img
-          src='./img.jpeg'
-          alt="Document Analysis Illustration"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 1 }}
-          className="mt-12 w-full max-w-lg drop-shadow-lg"
-        /> */}
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -51,7 +41,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-bold text-gray-800 mb-6"
           >
-            Why Document Layout Analysis?
+            Why Smart Research Paper Analyzer?
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -60,24 +50,23 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-lg text-gray-600 max-w-3xl mx-auto"
           >
-            Extracting and structuring information from PDFs or scanned documents is crucial
-            for automation, research, and digital workflows. Our tool makes it faster,
-            more accurate, and easier than ever.
+            Extracting structured information from research papers is essential for automating academic workflows, improving metadata extraction, and accelerating literature analysis. Traditional OCR tools fail to accurately capture structured sections like abstracts, titles, and author names due to complex layouts.
+            Smart Research Paper Analyzer solves this by combining AI-powered layout detection with targeted OCR, making research paper analysis faster, more reliable, and more accurate than ever.
           </motion.p>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {[
               {
                 title: "Accurate Detection",
-                desc: "Identifies document sections like titles, tables, paragraphs, and more.",
+                desc: "Identifies key sections such as title, author names, abstract, and introduction from research papers with high precision.",
               },
               {
                 title: "AI Powered",
-                desc: "Uses advanced AI models to understand complex layouts.",
+                desc: "Utilizes the YOLO DocSynth model and deep learning techniques to intelligently detect and understand research paper structures.",
               },
               {
                 title: "Time Saving",
-                desc: "Processes your documents in seconds, not hours.",
+                desc: "Processes and extracts meaningful content from research paper first pages in seconds, streamlining digital academic analysis.",
               },
             ].map((item, idx) => (
               <motion.div
@@ -106,6 +95,15 @@ export default function HomePage() {
           className="max-w-5xl mx-auto"
         >
           <Body />
+        </motion.div>
+        <motion.div
+          initial={{opacity: 0, y: 50}}
+          whileInView={{opacity : 1, y: 0}}
+          transition={{duration: 1}}
+          viewport={{once: true}}
+          
+          >
+            <Footer />
         </motion.div>
       </section>
     </div>

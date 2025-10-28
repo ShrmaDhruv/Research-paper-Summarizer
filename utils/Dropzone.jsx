@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function MyDropzone() {
   const [files, setFiles] = useState([]);
   const [uploadMessage, setUploadMessage] = useState("");
-  const [loading, setLoading] = useState(false); //added loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleUpload = async (file) => {
@@ -30,7 +30,7 @@ export default function MyDropzone() {
   };
 
   const handleProcess = async () => {
-    setLoading(true); // start spinner
+    setLoading(true);
     try {
       const res = await fetch("http://127.0.0.1:8000/process/");
       const data = await res.json();
@@ -43,7 +43,7 @@ export default function MyDropzone() {
       console.error(err);
       alert("Error connecting to backend");
     } finally {
-      setLoading(false); // ✅ stop spinner
+      setLoading(false);
     }
   };
 
@@ -131,7 +131,6 @@ export default function MyDropzone() {
 
           {uploadMessage.startsWith("File uploaded successfully") && (
             <>
-              {/* ✅ Process button + spinner */}
               <button
                 onClick={handleProcess}
                 disabled={loading}
