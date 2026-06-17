@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: metadata-extractor
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: YOLO_CONFIG_DIR
+        value: /app/data/yolo_config
+      - key: CLIENT_ORIGINS
+        value: "*"

@@ -10,7 +10,18 @@ const fadeIn = {
 export default function Process() {
   const location = useLocation();
   const navigate = useNavigate();
-  const raw = location.state?.content || {};
+  const stored = sessionStorage.getItem("metadataResult");
+  let storedContent = {};
+
+  if (stored) {
+    try {
+      storedContent = JSON.parse(stored);
+    } catch {
+      storedContent = {};
+    }
+  }
+
+  const raw = location.state?.content || storedContent;
 
   // --- 1. Data Parsing ---
   let parsed = raw;
@@ -25,7 +36,7 @@ export default function Process() {
   // --- 2. Helper to Normalize Lists ---
   const normalize = (v) => {
     if (!v) return [];
-    if (Array.isArray(v)) return v.map((x) => x.trim()).filter(Boolean);
+    if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean);
     if (typeof v === "string")
       return v
         .split(/,|\n/)
@@ -51,6 +62,11 @@ export default function Process() {
     affiliations: false,
     keywords: false,
   });
+
+  const hasMetadata =
+    Boolean(data.TITLE) ||
+    Boolean(data.ABSTRACT) ||
+    Boolean(data.METADATA);
 
   // --- 4. Save & Lock Functions ---
   const saveAuthors = () => {
@@ -154,6 +170,27 @@ export default function Process() {
     locked.emails &&
     locked.affiliations &&
     locked.keywords;
+
+  if (!hasMetadata) {
+    return (
+      <div className="min-h-screen w-full bg-slate-100 flex items-center justify-center px-6">
+        <div className="bg-white border border-gray-200 shadow-lg rounded-xl p-8 max-w-lg text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            No metadata available
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Upload a PDF and click Process to extract metadata.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+          >
+            Back to Upload
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-slate-100 flex">

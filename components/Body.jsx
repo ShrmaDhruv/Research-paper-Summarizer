@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import MyDropzone from "../utils/Dropzone";
+import { apiUrl } from "../utils/api";
 
 export default function Body() {
   const [uploadStatus, setUploadStatus] = useState("");
@@ -16,7 +17,7 @@ export default function Body() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8000/upload/", {
+      const res = await fetch(apiUrl("/upload/"), {
         method: "POST",
         body: formData,
       });

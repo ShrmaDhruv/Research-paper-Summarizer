@@ -1,5 +1,5 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import shutil
@@ -7,12 +7,47 @@ import os
 import Python.OCR as my
 from Python.MetaData import SummarizeSection
 import json
+import uuid
 
 
-UPLOAD_FOLDER = "uploads"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+DIST_DIR = os.path.join(BASE_DIR, "dist")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 PDF_NAME = ""
+
+
+def get_cors_origins():
+    origins = os.getenv("CLIENT_ORIGINS", "*").strip()
+    if origins == "*":
+        return ["*"]
+    return [origin.strip() for origin in origins.split(",") if origin.strip()]
+
+
+def make_upload_filename(original_filename: str) -> tuple[str, str]:
+    filename = os.path.basename(original_filename or "").strip()
+    if not filename:
+        raise HTTPException(status_code=400, detail="Invalid file name")
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF uploads are supported")
+
+    safe_name = "".join(
+        char if char.isalnum() or char in " ._-" else "_" for char in filename
+    ).strip()
+    return f"{uuid.uuid4().hex}_{safe_name}", filename
+
+
+def resolve_uploaded_file(filename: str | None) -> str:
+    selected_filename = os.path.basename(filename or PDF_NAME).strip()
+    if not selected_filename:
+        raise HTTPException(status_code=400, detail="No file uploaded yet")
+
+    file_path = os.path.join(UPLOAD_FOLDER, selected_filename)
+    if not os.path.isfile(file_path):
+        raise HTTPException(status_code=404, detail="Uploaded file was not found")
+
+    return selected_filename
 
 
 
@@ -39,10 +74,11 @@ app = FastAPI(lifespan=lifespan)
 
 
 # CORS
+cors_origins = get_cors_origins()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials=cors_origins != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -52,28 +88,36 @@ app.add_middleware(
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     try:
-        file_location = os.path.join(UPLOAD_FOLDER, file.filename)
+        stored_filename, original_filename = make_upload_filename(file.filename)
+        file_location = os.path.join(UPLOAD_FOLDER, stored_filename)
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         global PDF_NAME
-        PDF_NAME = file.filename
+        PDF_NAME = stored_filename
 
-        return {"filename": file.filename, "message": "File uploaded successfully"}
+        return {
+            "filename": stored_filename,
+            "originalFilename": original_filename,
+            "message": "File uploaded successfully",
+        }
     except Exception as e:
-        return {"error": str(e)}
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok"}
 
 
 # PROCESS FILE ROUTE
 @app.get("/process/")
-async def process_file():
-    global PDF_NAME
-
-    if not PDF_NAME:
-        return {"error": "No file uploaded yet"}
-
+async def process_file(filename: str | None = None):
     try:
-        my.output(PDF_NAME)
+        selected_filename = resolve_uploaded_file(filename)
+        my.output(selected_filename)
         result = SummarizeSection()
 
         # Ensure JSON serializable
@@ -81,5 +125,19 @@ async def process_file():
 
         return JSONResponse(content=safe_json)
 
+    except HTTPException:
+        raise
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_frontend(full_path: str):
+    if not os.path.isdir(DIST_DIR):
+        return {"message": "API is running. Build the frontend to enable the web UI."}
+
+    requested_file = os.path.join(DIST_DIR, full_path)
+    if full_path and os.path.isfile(requested_file):
+        return FileResponse(requested_file)
+
+    return FileResponse(os.path.join(DIST_DIR, "index.html"))

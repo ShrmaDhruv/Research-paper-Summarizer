@@ -2,26 +2,34 @@
 ---------PAGE 1--------
 
 
-[TITLE] Solving Spatial Supersensing Without Spatial Supersensing
+[TITLE] Fast CNN-based document layout analysis
 
 
-[PLAIN_TEXT] Vishaal Udandarao! Shyamgopal Karthikt SurabhiS. Nath? Andreas Hochlehnert Matthias Bethge! Ameya Prabhu!
-
-[PLAIN_TEXT] 'Tiibingen AI Center, University of Tiibingen ?Max Planck Institute for Biological Cybernetics
-
-[TITLE] ©) github.com/bethgelab/supersanity
-
+[PLAIN_TEXT] Dario Augusto Borges Oliveira IBM Research Brazil Rua Tutoia, 1157, Paraiso, Sao Paulo, Brazil dariobo@br.ibm.com
 
 [TITLE] Abstract
 
 
-[PLAIN_TEXT] Cambrian-S aims to take the first steps towards improving video “world models” with spatial supersensing by introducing (i) two benchmarks, VSI-Super-Recall (VSR) and VSI-Super-Counting (VSC), and (ii) bespoke predictive sensing inference strategies tailored to each benchmark. In this work, we conduct a critical analysis of Cambrian-S across both these fronts. First, we introduce a simple baseline, NoSense, which discards almost all temporal structure and uses only a bag-of-words SigLIP model, yet near-perfectly solves VSR, achieving 95% accuracy even on 4-hour videos. This shows benchmarks like VSR can be nearly solved without spatial cognition, world modeling or spatial supersensing. Second, we hypothesize that the tailored inference methods proposed by Cambrian-S likely exploit shortcut heuristics in the benchmark. We illustrate this with a simple sanity check on the VSC benchmark, called VSC-Repeat: We concatenate each video with itself 1-5 times, which does not change the number of unique objects. However, this simple perturbation entirely collapses the mean relative accuracy of Cambrian-S from 42.0% to 0%. A system that performs spatial supersensing and integrates information across experiences should recognize views of the same scene and keep object-count predictions unchanged; instead, Cambrian-S’ inference algorithm relies largely on a shortcut in the VSC benchmark that rooms are never revisited. Taken together, our findings suggest that (i) current VSI-Super benchmarks do not yet reliably measure spatial supersensing, and (ii) predictive-sensing inference recipes used by Cambrian-S improve performance by inadvertently exploiting shortcuts rather than from robust spatial supersensing. We include the response from the Cambrian-S authors (in Appendix A) to provide a balanced perspective alongside our claims.
+[PLAIN_TEXT] Automatic document layout analysis is a crucial step in cognitive computing and processes that extract information out of document images, such as specific-domain knowledge database creation, graphs and images understanding, extraction of structured data from tables, and others. Even with the progress observed in this field in the last years, challenges are still open and range from accurately detecting content boxes to classifying them into semantically meaningful classes. With the popularization of mobile devices and cloud-based services, the need for approaches that are both fast and economic in data usage is a reality. In this paper we propose a fast one-dimensional approach for automatic document layout analysis considering text, figures and tables based on convolutional neural networks (CNN). We take advantage of the inherently one-dimensional pattern observed in text and table blocks to reduce the dimension analysis from bi-dimensional documents images to 1D signatures, improving significantly the overall performance: we present considerably faster execution times and more compact data usage with no loss in overall accuracy if compared with a classical bidimensional CNN approach.
 
-[IMAGE CAPTION] Figure 1: (Left) NoSense solves VSR without supersensing. Our NoSense baseline uses only a SigLIP model with independent frame-level processing — no video model, LLM, long-term memory, or temporal reasoning — yet almost perfectly solves VSR, showing that the VSR benchmark can be solved without spatial supersensing. (Right) Cambrian-S exploits VSC-specific shortcuts. For the VSC benchmark, we repeat each 10-min video 1—5 times; a supersensing model should output the same object counts, since the unique object count stays the same. Instead, Cambrian-S’ mean relative accuracy collapses from 42% to 0% after 5 repeats, indicating that its surprise-based segmentation inference method relies on VSC-specific shortcuts rather than genuine spatial cognition.
-
-
-[IMAGE] ./data/extracted_figures/figure_8.png
+[TITLE] 1. Introduction
 
 
-[IMAGE] ./data/extracted_figures/figure_12.png
+[PLAIN_TEXT] Documents are a very important source of information for many different cognitive processes such as knowledge database creation, OCR, graphic understanding, document retrieval, and others. A crucial step to extract information out of documents is the layout analysis, which consists of identifying and categorizing document images regions of interest.
 
+[PLAIN_TEXT] In literature, many methods have been proposed for document image layout analysis, and according to [11] they can be classified into three different groups: (i) region or block based classification methods [21!, 17], (ii) pixel based classification methods [14, |3], (i1i) connected component classification methods [6, 20, |]. Methods based on region
+
+
+[PLAIN_TEXT] Matheus Palhares Viana IBM Research Brazil Rua Tutoia, 1157, Paraiso, Sao Paulo, Brazil mpviana@br.ibm.com
+
+
+[PLAIN_TEXT] or block bases classification usually segment a document image page into document zones, and then classify them into meaningful semantic classes. Pixel-based classification methods take each pixel individually into account and use a classifier to generate a labelled image with regions hypotheses. Connected components approaches use local information to create object hypotheses that are further inspected, combined and refined, and finally classified.
+
+
+[PLAIN_TEXT] When it comes to image classification, convolutional neural networks (CNNs) have been widely adopted in many different fields for a variety of purposes, including document analysis [9, 8]. However, their inherent very intense computational burden usually limits the cost-benefit of using them in document storage and retrieval applications where low memory and fast processing are vital. [3, 4] proposed methods to reduce the computation burden of document analysis using projections for identifying image blocks but do not benefit from the robustness of CNNs using a one-dimensional convolutional architecture. This scenario creates many opportunities for innovative CNN-based methods for document analysis that reduce the computational cost and data usage without decreasing the expected accuracy.
+
+
+[PLAIN_TEXT] In this paper, we propose a block based classification method that consists of three steps: i) pre-process a document input image and segment it into its blocks of content; ii) use their vertical and horizontal projections to train a CNN model for multi-class classification considering text, image and table classes; iii) detect new documents layout using a pipeline including the trained CNN model.
+
+
+[PLAIN_TEXT] Our main contribution is the novel one-dimensional CNN approach for fast automatic layout detection of structured image documents. A common bi-dimensional CNN procedure was also implemented for comparing performances and show that our method delivers the same accuracy with a lower computational cost and data usage associated. Our approach can be useful, for example, for applications in mobile devices due to its low computational cost or for services in the cloud that could benefit of sending/receiving compact one-dimensional data.

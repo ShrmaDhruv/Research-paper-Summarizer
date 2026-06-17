@@ -1,0 +1,9 @@
+fastapi==0.119.0
+uvicorn==0.38.0
+python-multipart==0.0.20
+doclayout_yolo==0.0.4
+numpy==2.2.6
+pillow==11.3.0
+pypdfium2==4.30.0
+pytesseract==0.3.13
+spacy==3.8.11

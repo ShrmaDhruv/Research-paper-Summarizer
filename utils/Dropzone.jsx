@@ -2,10 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "./api";
 
 export default function MyDropzone() {
   const [files, setFiles] = useState([]);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState(
+    sessionStorage.getItem("uploadedPdfName") || ""
+  );
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,35 +18,48 @@ export default function MyDropzone() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/upload/", {
+      const res = await fetch(apiUrl("/upload/"), {
         method: "POST",
         body: formData,
       });
 
-      if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
       const data = await res.json();
-      console.log("File uploaded successfully:", data.filename);
-      setUploadMessage(`File uploaded successfully: ${data.filename}`);
+
+      if (!res.ok) {
+        throw new Error(data.detail || `Upload failed with status ${res.status}`);
+      }
+
+      setUploadedFileName(data.filename);
+      sessionStorage.setItem("uploadedPdfName", data.filename);
+      console.log("File uploaded successfully:", data.originalFilename || data.filename);
+      setUploadMessage(
+        `File uploaded successfully: ${data.originalFilename || data.filename}`
+      );
     } catch (err) {
       console.log("Error:", err);
-      setUploadMessage("Upload failed. Check backend console for details.");
+      setUploadMessage(err.message || "Upload failed. Check backend console for details.");
     }
   };
 
   const handleProcess = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/process/");
+      const fileName = uploadedFileName || sessionStorage.getItem("uploadedPdfName");
+      const query = fileName ? `?filename=${encodeURIComponent(fileName)}` : "";
+      const res = await fetch(apiUrl(`/process/${query}`));
       const data = await res.json();
 
-      // console.log("BACKEND RAW DATA:", data);
-      // debugger;
+      if (!res.ok || data.error) {
+        throw new Error(data.detail || data.error || "Processing failed");
+      }
 
-      navigate("/process", { state: { content: JSON.parse(JSON.stringify(data)) } });
+      const content = JSON.parse(JSON.stringify(data));
+      sessionStorage.setItem("metadataResult", JSON.stringify(content));
+      navigate("/process", { state: { content } });
 
     } catch (err) {
       console.error(err);
-      alert("Error connecting to backend");
+      alert(err.message || "Error connecting to backend");
     } finally {
       setLoading(false);
     }

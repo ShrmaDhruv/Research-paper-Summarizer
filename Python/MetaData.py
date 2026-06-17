@@ -2,6 +2,18 @@ import re
 import spacy
 import os
 import unicodedata
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+_NLP = None
+
+
+def get_nlp():
+    global _NLP
+    if _NLP is None:
+        _NLP = spacy.load("en_core_web_md")
+    return _NLP
+
 def load_tagged_lines(text):
     lines = []
     for line in text.split("\n"):
@@ -275,14 +287,14 @@ def parse_paper(lines, nlp):
     return result
 
 def SummarizeSection():
-    path = os.path.join(os.getcwd(), "./data/content.txt")    
+    path = os.path.join(DATA_DIR, "content.txt")
     if not os.path.exists(path):
         print(f"File not found at {path}")
         return {}
     with open(path, 'r', encoding='utf-8', errors='replace') as file:
         text = file.read()
     
-    nlp = spacy.load("en_core_web_md")
+    nlp = get_nlp()
     lines = load_tagged_lines(text)
     res = parse_paper(lines, nlp)
     return res
