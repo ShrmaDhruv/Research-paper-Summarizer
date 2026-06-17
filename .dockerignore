@@ -1,0 +1,14 @@
+.git
+.parcel-cache
+.venv
+node_modules
+dist
+__pycache__
+*.pyc
+*.pyo
+*.log
+
+uploads
+data/content.txt
+data/extracted_figures
+output.png

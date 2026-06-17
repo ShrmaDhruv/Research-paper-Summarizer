@@ -7,3 +7,8 @@ dist/
 test/
 uploads/
 __pycache__/
+*.pyc
+data/content.txt
+data/extracted_figures/
+output.png
+.env
