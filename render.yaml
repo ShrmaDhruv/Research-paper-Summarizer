@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: metadata-extractor
-    runtime: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    healthCheckPath: /health

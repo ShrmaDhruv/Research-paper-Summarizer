@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import shutil
@@ -9,9 +9,7 @@ from Python.MetaData import SummarizeSection
 import json
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-DIST_DIR = os.path.join(BASE_DIR, "dist")
+UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 PDF_NAME = ""
@@ -44,30 +42,24 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
 
 
 # FILE UPLOAD ROUTE
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     try:
-        safe_filename = os.path.basename(file.filename)
-        file_location = os.path.join(UPLOAD_FOLDER, safe_filename)
+        file_location = os.path.join(UPLOAD_FOLDER, file.filename)
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         global PDF_NAME
-        PDF_NAME = safe_filename
+        PDF_NAME = file.filename
 
-        return {"filename": safe_filename, "message": "File uploaded successfully"}
+        return {"filename": file.filename, "message": "File uploaded successfully"}
     except Exception as e:
         return {"error": str(e)}
 
@@ -91,15 +83,3 @@ async def process_file():
 
     except Exception as e:
         return {"error": str(e)}
-
-
-@app.get("/{full_path:path}", include_in_schema=False)
-async def serve_frontend(full_path: str):
-    if not os.path.isdir(DIST_DIR):
-        return {"message": "API is running. Build the frontend to enable the web UI."}
-
-    requested_file = os.path.join(DIST_DIR, full_path)
-    if full_path and os.path.isfile(requested_file):
-        return FileResponse(requested_file)
-
-    return FileResponse(os.path.join(DIST_DIR, "index.html"))
